@@ -1,0 +1,226 @@
+.sidebar {
+  width: 320px;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px 24px;
+  height: 100vh;
+  position: relative;
+  /* We remove solid border, the image just shows it floating on dark bg or matching exactly */
+}
+
+/* Glowing scrollbar-like indicator on the right edge */
+.sidebar .decorative-scroll-line {
+  position: absolute;
+  right: 0;
+  top: 100px;
+  bottom: 0;
+  width: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar .decorative-scroll-line .thumb {
+  position: absolute;
+  top: 50px;
+  height: 250px;
+  width: 100%;
+  background-color: var(--accent-purple);
+  border-radius: 4px 0 0 4px;
+  box-shadow: -2px 0 15px rgba(168, 85, 247, 0.5);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+}
+
+.nav-item.active {
+  color: var(--text-main);
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.nav-item.active .nav-icon,
+.nav-item:hover .nav-icon {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-right: 12px;
+}
+
+/* Weekly Goal Card */
+.weekly-goal-card {
+  background: linear-gradient(135deg, #2d1f40, #1d1828);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.goal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.goal-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-title-area h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.goal-title-area p {
+  font-size: 0.85rem;
+  color: #cca4eb;
+}
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #cca4eb;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.task-subcard {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.task-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.task-text {
+  font-size: 0.85rem;
+  color: #cca4eb;
+  line-height: 1.5;
+}
+
+/* Profile Card */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-card:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.profile-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(147, 197, 253, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #93c5fd;
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.profile-role {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.profile-arrow {
+  color: var(--text-muted);
+  display: flex;
+}
