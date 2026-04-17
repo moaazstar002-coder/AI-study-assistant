@@ -6,7 +6,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 export const extractTextFromPDF = async (file) => {
-  
+    if (file.type !== "application/pdf") {
+    throw new Error("الملف مش PDF!");
+  }
+
   const arrayBuffer = await file.arrayBuffer();
 
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;

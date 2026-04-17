@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Modal from "./components/Modal";
 import AnalysisPage from "./pages/AnalysisPage";
+import "./App.css";
 
 function App() {
   return (

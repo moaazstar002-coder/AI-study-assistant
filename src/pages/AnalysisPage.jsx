@@ -11,36 +11,44 @@ export default function AnalysisPage() {
 
   const [status, setStatus] = useState("reading");
   const [result, setResult] = useState("");
-
+  const [errorMsg, setErrorMsg] = useState("");
+  
   useEffect(() => {
     if (!file) {
       navigate("/");
       return;
     }
+  
+    const runAnalysis = async () => {
+      try {
+        setStatus("reading");
+        setErrorMsg("");
+        const text = await extractTextFromPDF(file);
+        
+        setStatus("analyzing");
+        const analysis = await analyzeStudyMaterial(text);
+        
+        setResult(analysis);
+        setStatus("done");
+      } catch (err) {
+        console.error(err);
+        setErrorMsg(err.message || "حدث خطأ أثناء التحليل");
+        setStatus("error");
+      }
+    };
+    
     runAnalysis();
-  }, []);
-
-  const runAnalysis = async () => {
-    try {
-      setStatus("reading");
-      const text = await extractTextFromPDF(file);
-
-      setStatus("analyzing");
-      const analysis = await analyzeStudyMaterial(text);
-
-      setResult(analysis);
-      setStatus("done");
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
-    }
-  };
+  }, [file, navigate]);
 
   if (status === "reading" || status === "analyzing") {
     return (
       <div className="analysis-loading">
         <ReadingEyes />
-        <p>{status === "reading" ? "Reading your file..." : "Kozmo is thinking..."}</p>
+        <p>
+          {status === "reading"
+            ? "Reading your file..."
+            : "Kozmo is thinking..."}
+        </p>
       </div>
     );
   }
@@ -48,19 +56,20 @@ export default function AnalysisPage() {
   if (status === "error") {
     return (
       <div className="analysis-error">
-        <p>Something went wrong. Please try again.</p>
-        <button onClick={() => navigate("/")}>Go Back</button>
+        <p>❌ حدث خطأ أثناء التحليل</p>
+        <p style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>{errorMsg}</p>
+        <button onClick={() => navigate("/")}>العودة للرئيسية</button>
       </div>
     );
   }
 
   return (
     <div className="analysis-result">
-      <h2>Analysis for: {file.name}</h2>
+      <h2>📚 تحليل: {file.name}</h2>
       <div className="result-content">
         <pre>{result}</pre>
       </div>
-      <button onClick={() => navigate("/")}>Analyze Another File</button>
+      <button onClick={() => navigate("/")}>تحليل ملف آخر ➜</button>
     </div>
   );
 }
