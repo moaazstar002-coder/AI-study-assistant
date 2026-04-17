@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactMarkdown from 'react-markdown';
 import { useLocation, useNavigate } from "react-router-dom";
 import { extractTextFromPDF } from "../services/pdfReader";
 import { analyzeStudyMaterial } from "../services/gemini";
@@ -64,12 +65,19 @@ export default function AnalysisPage() {
   }
 
   return (
-    <div className="analysis-result">
-      <h2>📚 تحليل: {file.name}</h2>
-      <div className="result-content">
-        <pre>{result}</pre>
+    <div className="analysis-result" dir="rtl">
+      <h2>
+        <span style={{ fontSize: '2.5rem' }}>📚</span>
+        <span>تحليل: {file.name}</span>
+      </h2>
+      <div className="result-content" dir="auto">
+        <ReactMarkdown>{result}</ReactMarkdown>
       </div>
-      <button onClick={() => navigate("/")}>تحليل ملف آخر ➜</button>
+      <div className="action-buttons">
+        <button onClick={() => navigate("/")}>
+          تحليل ملف آخر <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>↺</span>
+        </button>
+      </div>
     </div>
   );
 }
