@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Modal from "./components/Modal";
 import AnalysisPage from "./pages/AnalysisPage";
+import Chat from "./pages/chat/chat";
 import "./App.css";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             </div>
           } />
           <Route path="/analysis" element={<AnalysisPage />} />
+          <Route path="/Chat" element={<Chat />} />
         </Routes>
       </main>
     </div>
