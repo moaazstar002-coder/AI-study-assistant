@@ -18,3 +18,20 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
   const result = await model.generateContent(prompt);
   return result.response.text();
 };
+
+export const chatWithGemini = async (history, newMessage) => {
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+  
+  // Format history for Gemini API where user is "user" and bot is "model".
+  const formattedHistory = history.map((msg) => ({
+    role: msg.role === "bot" ? "model" : "user",
+    parts: [{ text: msg.content }],
+  }));
+
+  const chat = model.startChat({
+    history: formattedHistory,
+  });
+
+  const result = await chat.sendMessage(newMessage);
+  return result.response.text();
+};

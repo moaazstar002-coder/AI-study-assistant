@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { extractTextFromPDF } from "../services/pdfReader";
 import { analyzeStudyMaterial } from "../services/gemini";
 import ReadingEyes from "../components/eyes";
+import { Sparkles } from "lucide-react";
+import useKozmoStore from "../store/store";
 
 export default function AnalysisPage() {
   const location = useLocation();
@@ -13,6 +15,48 @@ export default function AnalysisPage() {
   const [status, setStatus] = useState("reading");
   const [result, setResult] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const { clearChat } = useKozmoStore();
+  const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+
+  useEffect(() => {
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      
+      if (text.length > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        setPopupPos({
+          x: rect.left + rect.width / 2,
+          y: rect.top + window.scrollY - 45 
+        });
+        setSelectedText(text);
+        setShowPopup(true);
+      } else {
+         // small delay to allow click on popup before disappearing
+         setTimeout(() => {
+           const newSelection = window.getSelection().toString().trim();
+           if (!newSelection) setShowPopup(false);
+         }, 100);
+      }
+    };
+    
+    document.addEventListener("mouseup", handleSelection);
+    document.addEventListener("touchend", handleSelection);
+    
+    return () => {
+      document.removeEventListener("mouseup", handleSelection);
+      document.removeEventListener("touchend", handleSelection);
+    };
+  }, []);
+
+  const handleAskExplain = () => {
+    clearChat();
+    navigate("/Chat", { state: { explainText: selectedText } });
+  };
   
   useEffect(() => {
     if (!file) {
@@ -78,6 +122,37 @@ export default function AnalysisPage() {
           تحليل ملف آخر <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>↺</span>
         </button>
       </div>
+
+      {showPopup && (
+        <button 
+          onClick={handleAskExplain}
+          onMouseDown={(e) => e.preventDefault()} // prevent selection loss on click
+          style={{
+            position: "absolute",
+            left: `${popupPos.x}px`,
+            top: `${popupPos.y}px`,
+            transform: "translateX(-50%)",
+            backgroundColor: "rgba(15, 23, 42, 0.8)",
+            color: "white",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "20px",
+            padding: "8px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+            transition: "opacity 0.2s ease, transform 0.2s ease",
+            animation: "popupFadeIn 0.2s ease-out forwards",
+          }}
+        >
+          <Sparkles size={16} color="#60a5fa" />
+          <span>اشرحلي ده</span>
+        </button>
+      )}
     </div>
   );
 }

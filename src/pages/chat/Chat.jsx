@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import useKozmoStore from "../../store/store";
+
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -11,20 +13,14 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import "./chat.css";
-
-const MOCK_MESSAGES = [
-  {
-    id: 1,
-    role: "bot",
-    content:
-      "Hello Moaaz! 👋 I am Kozmo your AI Study Assistant. What would you like to focus on today?",
-  },
-];
+import { chatWithGemini } from "../../services/gemini";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Chat() {
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const { messages, addMessage, isTyping, setIsTyping } = useKozmoStore();
   const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -35,31 +31,53 @@ export default function Chat() {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    if (location.state?.explainText) {
+      const textToExplain = location.state.explainText;
+      // Clear the state so refreshing doesn't send it again
+      navigate(location.pathname, { replace: true });
+      const initialPrompt = `ممكن تشرحلي الجزء ده بشكل مبسط:\n"${textToExplain}"`;
+      sendMessage(initialPrompt);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state, navigate]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
+    const textToSend = inputValue.trim();
+    setInputValue("");
+    sendMessage(textToSend);
+  };
 
+  const sendMessage = async (text) => {
     const newUserMessage = {
       id: Date.now(),
       role: "user",
-      content: inputValue.trim(),
+      content: text,
     };
 
-    setMessages((prev) => [...prev, newUserMessage]);
-    setInputValue("");
+    addMessage(newUserMessage);
     setIsTyping(true);
-
-    // Simulate AI response
-    setTimeout(() => {
+    
+    try {
+      const responseText = await chatWithGemini(messages, text);
       const newBotMessage = {
         id: Date.now() + 1,
         role: "bot",
-        content:
-          "I'm processing your request. Since I'm currently running offline as an interface mockup, I highly recommend expanding on this feature later by integrating a true Language Model API!",
+        content: responseText,
       };
-      setMessages((prev) => [...prev, newBotMessage]);
+      addMessage(newBotMessage);
+    } catch (err) {
+      console.error(err);
+      addMessage({
+        id: Date.now() + 1,
+        role: "bot",
+        content: "❌ Sorry, I encountered an error. Please try again.",
+      });
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -104,6 +122,7 @@ export default function Chat() {
             ))}
             {isTyping && (
               <motion.div
+                key="typing-indicator"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
