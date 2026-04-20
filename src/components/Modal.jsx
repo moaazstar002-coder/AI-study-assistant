@@ -2,11 +2,13 @@ import { useState } from "react";
 import { X, Upload, FileText, Trash2 } from "lucide-react";
 import "../styles/modal.css";
 import { useNavigate } from "react-router-dom";
+import useKozmoStore from "../store/store";
 
 export default function Modal() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
+  const { setAnalysisFile, setAnalysisStatus } = useKozmoStore();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -19,7 +21,9 @@ export default function Modal() {
   };
 
   const handleAnalyze = () => {
-    navigate("/analysis", { state: { file: selectedFile } });
+    setAnalysisFile(selectedFile);
+    setAnalysisStatus("reading");
+    navigate("/analysis");
     setIsOpen(false);
   };
 

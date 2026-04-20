@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Sidebar.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import useKozmoStore from "../store/store";
 
 const CalendarIcon = () => (
   <svg
@@ -138,20 +139,40 @@ const ChatIcon = () => (
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
   </svg>
 );
+const FileTextIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+    <polyline points="10 9 9 9 8 9"></polyline>
+  </svg>
+);
 export default function Sidebar() {
-  const [activeItem, setActiveItem] = useState("Study Plan");
+  const [activeItem, setActiveItem] = useState("Home");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { xp } = useKozmoStore();
+  
+  const level = Math.floor(xp / 100) + 1;
+  const progressPercent = xp % 100;
+
   const navItems = [
-    { name: "Home", icon: <HomeIcon /> },
-    { name: "Study Plan", icon: <CalendarIcon /> },
-    { name: "Progress", icon: <BarChartIcon /> },
-    { name: "Settings", icon: <SettingsIcon /> },
-    {
-      name: "Chat",
-      icon: <ChatIcon />,
-      onClick: () => navigate("/Chat"),
-    },
+    { name: "Home", icon: <HomeIcon />, onClick: () => navigate("/") },
+    { name: "Analysis", icon: <FileTextIcon />, onClick: () => navigate("/analysis") },
+    { name: "Study Plan", icon: <CalendarIcon />, onClick: () => navigate("/studyplan") },
+    { name: "Progress", icon: <BarChartIcon />, onClick: () => navigate("/progress") },
+    { name: "Settings", icon: <SettingsIcon />, onClick: () => navigate("/settings") },
+    { name: "Chat", icon: <ChatIcon />, onClick: () => navigate("/Chat") },
   ];
+
+  // Optional: Auto-sync active item based on current route
+  React.useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path === "/") setActiveItem("Home");
+    else if (path.includes("analysis")) setActiveItem("Analysis");
+    else if (path.includes("chat")) setActiveItem("Chat");
+  }, [location.pathname]);
 
   return (
     
@@ -163,11 +184,7 @@ export default function Sidebar() {
       className={`nav-item ${activeItem === item.name ? "active" : ""}`}
       onClick={() => {
         setActiveItem(item.name);
-        if (item.onClick) {
-          item.onClick();
-        } else {
-          navigate(item.name === "Home" ? "/" : `/${item.name.replace(" ", "")}`);
-        }
+        item.onClick();
       }}
     >
       <span className="nav-icon">{item.icon}</span>
@@ -189,11 +206,11 @@ export default function Sidebar() {
 
           <div className="progress-section">
             <div className="progress-labels">
-              <span>Progress</span>
-              <span>72%</span>
+              <span>Level {level} Focus</span>
+              <span>{progressPercent}%</span>
             </div>
             <div className="progress-bar-bg">
-              <div className="progress-bar-fill" style={{ width: "72%" }}></div>
+              <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }}></div>
             </div>
           </div>
 
@@ -202,7 +219,7 @@ export default function Sidebar() {
               <TargetIcon />
             </div>
             <p className="task-text">
-              Complete 2 quizzes and review 15 flashcards today.
+              Total XP: {xp} — Keep learning to level up!
             </p>
           </div>
         </div>

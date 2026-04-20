@@ -17,7 +17,7 @@ import { chatWithGemini } from "../../services/gemini";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Chat() {
-  const { messages, addMessage, isTyping, setIsTyping } = useKozmoStore();
+  const { messages, addMessage, isTyping, setIsTyping, addXp } = useKozmoStore();
   const [inputValue, setInputValue] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
@@ -59,6 +59,7 @@ export default function Chat() {
 
     addMessage(newUserMessage);
     setIsTyping(true);
+    addXp(5);
     
     try {
       const responseText = await chatWithGemini(messages, text);

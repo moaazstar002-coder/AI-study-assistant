@@ -10,12 +10,18 @@ import useKozmoStore from "../store/store";
 export default function AnalysisPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { file } = location.state || {};
 
-  const [status, setStatus] = useState("reading");
-  const [result, setResult] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const { clearChat } = useKozmoStore();
+  const { 
+    analysisFile: file, 
+    analysisResult: result, 
+    analysisStatus: status, 
+    analysisError: errorMsg,
+    setAnalysisStatus,
+    setAnalysisResult,
+    setAnalysisError,
+    addXp,
+    clearChat 
+  } = useKozmoStore();
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
   const [showPopup, setShowPopup] = useState(false);
   const [selectedText, setSelectedText] = useState("");
@@ -60,30 +66,34 @@ export default function AnalysisPage() {
   
   useEffect(() => {
     if (!file) {
-      navigate("/");
+      if (location.pathname === '/analysis') navigate("/");
       return;
     }
   
+    if (status !== "reading") return;
+
     const runAnalysis = async () => {
       try {
-        setStatus("reading");
-        setErrorMsg("");
+        setAnalysisError("");
         const text = await extractTextFromPDF(file);
         
-        setStatus("analyzing");
+        setAnalysisStatus("analyzing");
         const analysis = await analyzeStudyMaterial(text);
         
-        setResult(analysis);
-        setStatus("done");
+        setAnalysisResult(analysis);
+        setAnalysisStatus("done");
+        
+        // Reward user
+        addXp(50);
       } catch (err) {
         console.error(err);
-        setErrorMsg(err.message || "حدث خطأ أثناء التحليل");
-        setStatus("error");
+        setAnalysisError(err.message || "حدث خطأ أثناء التحليل");
+        setAnalysisStatus("error");
       }
     };
     
     runAnalysis();
-  }, [file, navigate]);
+  }, [file, navigate, status, setAnalysisError, setAnalysisResult, setAnalysisStatus, addXp, location.pathname]);
 
   if (status === "reading" || status === "analyzing") {
     return (
